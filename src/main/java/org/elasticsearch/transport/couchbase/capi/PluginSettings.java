@@ -33,6 +33,8 @@ public class PluginSettings {
 
     private List<String> includeIndexes;
 
+    private List<String> excludeDocWrapperIndexes;
+
     public PluginSettings() {
         this.setCheckpointDocumentType(DEFAULT_DOCUMENT_TYPE_CHECKPOINT);
         this.setResolveConflicts(true);
@@ -48,9 +50,10 @@ public class PluginSettings {
         this.documentTypeRoutingFields = null;
         this.ignoreDeletes = null;
         this.ignoreDotIndexes = true;
+        this.excludeDocWrapperIndexes = null;
     }
 
-    public PluginSettings(String checkpointDocumentType, Boolean resolveConflicts, Boolean wrapCounters, Boolean ignoreFailures, String dynamicTypePath, long maxConcurrentRequests, long bulkIndexRetries, long bulkIndexRetryWaitMs, TypeSelector typeSelector, ParentSelector parentSelector, KeyFilter keyFilter, Map<String, String> documentTypeRoutingFields, List<String> ignoreDeletes, Boolean ignoreDotIndexes, List<String> includeIndexes) {
+    public PluginSettings(String checkpointDocumentType, Boolean resolveConflicts, Boolean wrapCounters, Boolean ignoreFailures, String dynamicTypePath, long maxConcurrentRequests, long bulkIndexRetries, long bulkIndexRetryWaitMs, TypeSelector typeSelector, ParentSelector parentSelector, KeyFilter keyFilter, Map<String, String> documentTypeRoutingFields, List<String> ignoreDeletes, Boolean ignoreDotIndexes, List<String> includeIndexes, List<String> excludeDocWrapperIndexes) {
         this.includeIndexes = includeIndexes;
         this.setCheckpointDocumentType(checkpointDocumentType);
         this.setResolveConflicts(resolveConflicts);
@@ -66,6 +69,7 @@ public class PluginSettings {
         this.documentTypeRoutingFields = documentTypeRoutingFields;
         this.ignoreDeletes = ignoreDeletes;
         this.ignoreDotIndexes = ignoreDotIndexes;
+        this.excludeDocWrapperIndexes = excludeDocWrapperIndexes;
     }
 
     @Override
@@ -86,6 +90,7 @@ public class PluginSettings {
                 ", documentTypeRoutingFields=" + documentTypeRoutingFields +
                 ", ignoreDeletes=" + ignoreDeletes +
                 ", includeIndexes=" + includeIndexes +
+                ", excludeDocWrapperIndexes=" + excludeDocWrapperIndexes +
                 '}';
     }
 
@@ -207,5 +212,13 @@ public class PluginSettings {
 
     public void setIncludeIndexes(List<String> includeIndexes) {
         this.includeIndexes = includeIndexes;
+    }
+
+    public List<String> getExcludeDocWrapperIndexes() {
+        return excludeDocWrapperIndexes;
+    }
+
+    public void setExcludeDocWrapperIndexes(List<String> excludeDocWrapperIndexes) {
+        this.excludeDocWrapperIndexes = excludeDocWrapperIndexes;
     }
 }

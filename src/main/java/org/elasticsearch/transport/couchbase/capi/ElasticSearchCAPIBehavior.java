@@ -364,8 +364,15 @@ public class ElasticSearchCAPIBehavior implements CAPIBehavior {
             // and the document contents to be indexed are in json
 
             Map<String, Object> toBeIndexed = new HashMap<String, Object>();
+
+            // If there is no doc wrapper for this index then the document will not be stored under a "doc" property.
+            if(pluginSettings.getExcludeDocWrapperIndexes() != null && pluginSettings.getExcludeDocWrapperIndexes().contains(index)) {
+                toBeIndexed = json;
+            } else {
+                toBeIndexed.put("doc", json);
+            }
+
             toBeIndexed.put("meta", meta);
-            toBeIndexed.put("doc", json);
 
             revisions.put(id, rev);
 
@@ -550,6 +557,10 @@ public class ElasticSearchCAPIBehavior implements CAPIBehavior {
         GetResponse response = client.prepareGet(index, docType, docId).execute().actionGet();
         if(response != null && response.isExists()) {
             Map<String,Object> esDocument = response.getSourceAsMap();
+            // If there is no doc wrapper for this index then return the whole document
+            if(pluginSettings.getExcludeDocWrapperIndexes() != null && pluginSettings.getExcludeDocWrapperIndexes().contains(index)) {
+                return esDocument;
+            }
             return (Map<String, Object>)esDocument.get("doc");
         }
         return null;
