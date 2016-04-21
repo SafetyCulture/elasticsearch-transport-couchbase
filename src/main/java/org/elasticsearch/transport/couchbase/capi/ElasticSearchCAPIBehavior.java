@@ -267,17 +267,17 @@ public class ElasticSearchCAPIBehavior implements CAPIBehavior {
 		//if set to true - all delete operations will be ignored
 		//ignoreDeletes contains a list of indexes to be ignored when delete events occur
 		//index list can be set in the elasticsearch.yml file using
-		//the key: couchbase.ignore.delete  the value is colon separated:  index1:index2:index3 
+		//the key: couchbase.ignore.delete  the value is colon separated:  index1:index2:index3
 		boolean ignoreDelete = pluginSettings.getIgnoreDeletes() != null && pluginSettings.getIgnoreDeletes().contains(index);
         logger.trace("ignoreDelete = {}", ignoreDelete);
-        
+
         // keep a map of the id - rev for building the response
         Map<String,String> revisions = new HashMap<String, String>();
 
         // put requests into this map, not directly into the bulk request
         Map<String,IndexRequest> bulkIndexRequests = new HashMap<String,IndexRequest>();
         Map<String,DeleteRequest> bulkDeleteRequests = new HashMap<String,DeleteRequest>();
-        
+
         //used for "mock" results in case of ignore deletes or filtered out keys
         List<Object> mockResults = new ArrayList<Object>();
 
@@ -368,6 +368,7 @@ public class ElasticSearchCAPIBehavior implements CAPIBehavior {
             // If there is no doc wrapper for this index then the document will not be stored under a "doc" property.
             if(pluginSettings.getExcludeDocWrapperIndexes() != null && pluginSettings.getExcludeDocWrapperIndexes().contains(index)) {
                 toBeIndexed = json;
+                toBeIndexed.remove("_sync");
             } else {
                 toBeIndexed.put("doc", json);
             }
@@ -391,7 +392,7 @@ public class ElasticSearchCAPIBehavior implements CAPIBehavior {
                 logger.trace("Using {} as the routing field for document type {}", routingField, type);
             }
             boolean deleted = meta.containsKey("deleted") ? (Boolean)meta.get("deleted") : false;
-            
+
             if(deleted) {
             	if (!ignoreDelete) {
                 	DeleteRequest deleteRequest = client.prepareDelete(index, type, id).request();
@@ -462,12 +463,12 @@ public class ElasticSearchCAPIBehavior implements CAPIBehavior {
                     break;
                 }
             }
-            
+
             if(bulkBuilder.numberOfActions() > 0)
 	            response = bulkBuilder.execute().actionGet();
             else
                 break;
-            
+
             if(response != null) {
                 for (BulkItemResponse bulkItemResponse : response.getItems()) {
                     String itemId = bulkItemResponse.getId();
