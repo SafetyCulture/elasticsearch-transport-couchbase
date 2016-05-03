@@ -368,6 +368,7 @@ public class ElasticSearchCAPIBehavior implements CAPIBehavior {
             // If there is no doc wrapper for this index then the document will not be stored under a "doc" property.
             if(pluginSettings.getExcludeDocWrapperIndexes() != null && pluginSettings.getExcludeDocWrapperIndexes().contains(index)) {
                 toBeIndexed = json;
+                toBeIndexed.put("_id", id);
                 toBeIndexed.remove("_sync");
             } else {
                 toBeIndexed.put("doc", json);
