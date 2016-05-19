@@ -127,6 +127,8 @@ public class CouchbaseCAPITransportImpl extends AbstractLifecycleComponent<Couch
         pluginSettings.setIgnoreDotIndexes(settings.getAsBoolean("couchbase.ignoreDotIndexes", true));
         pluginSettings.setIncludeIndexes(new ArrayList<String>(Arrays.asList(settings.get("couchbase.includeIndexes", "").split("[:,;\\s]"))));
         pluginSettings.getIncludeIndexes().removeAll(Arrays.asList("", null));
+        pluginSettings.setExcludeDocWrapperIndexes(new ArrayList<String>(Arrays.asList(settings.get("couchbase.excludeDocWrapperIndexes", "").split("[:,;\\s]"))));
+        pluginSettings.getExcludeDocWrapperIndexes().removeAll(Arrays.asList("", null));
 
         TypeSelector typeSelector;
         Class<? extends TypeSelector> typeSelectorClass = this.getAsClass(settings.get("couchbase.typeSelector"), DefaultTypeSelector.class);

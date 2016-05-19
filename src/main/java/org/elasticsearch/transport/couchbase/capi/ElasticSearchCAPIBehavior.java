@@ -364,8 +364,15 @@ public class ElasticSearchCAPIBehavior implements CAPIBehavior {
             // and the document contents to be indexed are in json
 
             Map<String, Object> toBeIndexed = new HashMap<String, Object>();
+
+            // If there is no doc wrapper for this index then the document will not be stored under a "doc" property.
+            if(pluginSettings.getExcludeDocWrapperIndexes() != null && pluginSettings.getExcludeDocWrapperIndexes().contains(index)) {
+                toBeIndexed = json;
+            } else {
+                toBeIndexed.put("doc", json);
+            }
+
             toBeIndexed.put("meta", meta);
-            toBeIndexed.put("doc", json);
 
             revisions.put(id, rev);
 
@@ -383,7 +390,15 @@ public class ElasticSearchCAPIBehavior implements CAPIBehavior {
                 routingField = pluginSettings.getDocumentTypeRoutingFields().get(type);
                 logger.trace("Using {} as the routing field for document type {}", routingField, type);
             }
-            boolean deleted = meta.containsKey("deleted") ? (Boolean)meta.get("deleted") : false;
+
+            boolean deleted = false;
+            if (meta.containsKey("deleted")) {
+                deleted = (Boolean)meta.get("deleted");
+            }
+            // Check for Sync Gateway _deleted flag if the document isn't already marked for deletion.
+            if (!deleted && toBeIndexed.containsKey("_deleted")) {
+                deleted = (Boolean)toBeIndexed.get("_deleted");   
+            }
             
             if(deleted) {
             	if (!ignoreDelete) {
@@ -550,6 +565,10 @@ public class ElasticSearchCAPIBehavior implements CAPIBehavior {
         GetResponse response = client.prepareGet(index, docType, docId).execute().actionGet();
         if(response != null && response.isExists()) {
             Map<String,Object> esDocument = response.getSourceAsMap();
+            // If there is no doc wrapper for this index then return the whole document
+            if(pluginSettings.getExcludeDocWrapperIndexes() != null && pluginSettings.getExcludeDocWrapperIndexes().contains(index)) {
+                return esDocument;
+            }
             return (Map<String, Object>)esDocument.get("doc");
         }
         return null;

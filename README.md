@@ -67,6 +67,7 @@ Configuration for the plugin is specified as part of the Elasticsearch config fi
 - **couchbase.wrapCounters** - Enabling this flag will cause the plugin to wrap integer values from Couchbase, which are not valid JSON documents, in a simple document before indexing them in Elasticsearch. The resulting document is in the format `{ "value" : <value> }` and is stored under the ID of the original value from Couchbase.
 - **couchbase.ignoreDotIndexes** - Enabled by default (`true`). Causes the plugin to completely ignore indexes/aliases whose name starts with ".", such as ".kibana", ".marvel", etc.
 - **couchbase.includeIndexes** - Specifying one or more index/alias names (as a comma or semicolon delimited string) here will cause the plugin to ignore the existence of all other indexes. For example, if you have only a few indexes replicated from Couchbase, there's no reason to store checkpoint metadata in all other indexes. Note that this setting takes precedence over ignoreDotIndexes, so if you whitelist an index or alias that starts with a dot, the plugin will use it. 
+- **couchbase.excludeDocWrapperIndexes** - Specifying one or more index/alias names (as a comma or semicolon delimited string) here will prevent that indexes documents from being wrapped in a "doc" property. Be aware that the metadata will now be stored directly in the document so any existing "meta" property will be overwritten.
 
 ### Mapping Couchbase documents to Elasticsearch types ###
 
