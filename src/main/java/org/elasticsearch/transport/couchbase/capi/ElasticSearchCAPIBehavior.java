@@ -390,7 +390,15 @@ public class ElasticSearchCAPIBehavior implements CAPIBehavior {
                 routingField = pluginSettings.getDocumentTypeRoutingFields().get(type);
                 logger.trace("Using {} as the routing field for document type {}", routingField, type);
             }
-            boolean deleted = meta.containsKey("deleted") ? (Boolean)meta.get("deleted") : false;
+
+            boolean deleted = false;
+            if (meta.containsKey("deleted")) {
+                deleted = (Boolean)meta.get("deleted");
+            }
+            // Check for Sync Gateway _deleted flag if the document isn't already marked for deletion.
+            if (!deleted && toBeIndexed.containsKey("_deleted")) {
+                deleted = (Boolean)toBeIndexed.get("_deleted");   
+            }
             
             if(deleted) {
             	if (!ignoreDelete) {
