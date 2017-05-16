@@ -8,12 +8,12 @@ This plugin makes your Elasticsearch node appear like a Couchbase Server node.  
 Installation
 ============
 
-Note that as of Elasticsearch version 2.0, plugins are version specific. This means that each minor version of Elasticsearch has a corresponding version of the plugin. For example, ES 2.3.1 works with plugin version 2.2.3.1 and so on. 
+Note that as of Elasticsearch version 2.0, plugins are version specific. This means that each minor version of Elasticsearch has a corresponding version of the plugin. For example, ES 2.3.1 works with plugin version 2.2.3.1 and so on.
 
 To install the ES 1.x compatible plugin, run the following command from your Elasticsearch installation folder:
 
     bin/plugin -i transport-couchbase -url http://packages.couchbase.com.s3.amazonaws.com/releases/elastic-search-adapter/2.1.2/elasticsearch-transport-couchbase-2.1.2.zip
-    
+
 To install the ES 2.1.1 compatible version, run the following command from your Elasticsearch installation folder:
 
     bin/plugin install https://github.com/couchbaselabs/elasticsearch-transport-couchbase/releases/download/v2.2.1.2/elasticsearch-transport-couchbase-2.2.1.2.zip
@@ -31,9 +31,9 @@ Version Compatibility:
     +------------------------------------------------------------------+
     | master                        |  2.5.x - 4.x  | 2.3.1            |
     +------------------------------------------------------------------+
-    | 2.2.3.x                       |  2.5.x - 4.x  | 2.3.x            | 
+    | 2.2.3.x                       |  2.5.x - 4.x  | 2.3.x            |
     +------------------------------------------------------------------+
-    | 2.2.2.x                       |  2.5.x - 4.x  | 2.2.x            | 
+    | 2.2.2.x                       |  2.5.x - 4.x  | 2.2.x            |
     +------------------------------------------------------------------+
     | 2.2.1                         |  2.5.x - 4.x  | 2.1.1            |
     +------------------------------------------------------------------+
@@ -43,11 +43,11 @@ Version Compatibility:
     +------------------------------------------------------------------+
     | 2.0                           |  3.x, 2.5.x   | 1.3.0            |
     +------------------------------------------------------------------+
-    
+
 # Configuration #
 
 **Important note for Elasticsearch 2.1**: Due to changes in the plugin security mechanism, when installing v2.2.0.x and v2.2.1.x of the plugin you must also edit the Java security policy to grant it appropriate permissions. See the **Java Security Policy Permissions** topic below for instructions.
- 
+
 **This workaround is not required for Elasticsearch 2.2+ with plugin 2.2.2.0+.**
 
 Configuration for the plugin is specified as part of the Elasticsearch config file (usually elasticsearch.yml) and is currently only read when Elasticsearch starts. Dynamic configuration support is planned for the future.
@@ -66,7 +66,7 @@ Configuration for the plugin is specified as part of the Elasticsearch config fi
 - **couchbase.ignoreDeletes** - Specifying one or more index names (as a comma or semicolon delimited string) here will cause the plugin to ignore document deletion and expiration for those indexes. This can be used to turn Elasticsearch into a sort of searchable archive for a Couchbase bucket. Note that this also means that the index will continue to grow indefinitely.
 - **couchbase.wrapCounters** - Enabling this flag will cause the plugin to wrap integer values from Couchbase, which are not valid JSON documents, in a simple document before indexing them in Elasticsearch. The resulting document is in the format `{ "value" : <value> }` and is stored under the ID of the original value from Couchbase.
 - **couchbase.ignoreDotIndexes** - Enabled by default (`true`). Causes the plugin to completely ignore indexes/aliases whose name starts with ".", such as ".kibana", ".marvel", etc.
-- **couchbase.includeIndexes** - Specifying one or more index/alias names (as a comma or semicolon delimited string) here will cause the plugin to ignore the existence of all other indexes. For example, if you have only a few indexes replicated from Couchbase, there's no reason to store checkpoint metadata in all other indexes. Note that this setting takes precedence over ignoreDotIndexes, so if you whitelist an index or alias that starts with a dot, the plugin will use it. 
+- **couchbase.includeIndexes** - Specifying one or more index/alias names (as a comma or semicolon delimited string) here will cause the plugin to ignore the existence of all other indexes. For example, if you have only a few indexes replicated from Couchbase, there's no reason to store checkpoint metadata in all other indexes. Note that this setting takes precedence over ignoreDotIndexes, so if you whitelist an index or alias that starts with a dot, the plugin will use it.
 - **couchbase.excludeDocWrapperIndexes** - Specifying one or more index/alias names (as a comma or semicolon delimited string) here will prevent that indexes documents from being wrapped in a "doc" property. Be aware that the metadata will now be stored directly in the document so any existing "meta" property will be overwritten.
 
 ### Mapping Couchbase documents to Elasticsearch types ###
@@ -76,7 +76,7 @@ Configuration for the plugin is specified as part of the Elasticsearch config fi
 		- **couchbase.typeSelector.defaultDocumentType** - The document type to which the DefaultTypeSelector will map all documents. Defaults to "couchbaseDocument".
 		- **couchbase.typeSelector.checkpointDocumentType** - The document type to which replication checkpoint documents will be mapped. Defaults to "couchbaseCheckpoint".
 	- **`org.elasticsearch.transport.couchbase.capi.DelimiterTypeSelector`** - If the document ID is of the format `<type><delimiter><*>`, this type selector will map these documents to the type `<type>`, otherwise it will use the `DefaultTypeSelector` for the type mapping. The default delimiter is `:`, so for example a document with the ID `user:123` will be indexed under the type `user`.
-		- **couchbase.typeSelector.documentTypeDelimiter** - Optional. The delimiter to use for the `DelimiterTypeSelector`. Default is `:`. 
+		- **couchbase.typeSelector.documentTypeDelimiter** - Optional. The delimiter to use for the `DelimiterTypeSelector`. Default is `:`.
 	- **`org.elasticsearch.transport.couchbase.capi.GroupRegexTypeSelector`** - Maps documents that match the specified regular expression with a capture group named `type`. If the document doesn't match the regular expression, or the regular expression doesn't define a capture group named `type`, the `DefaultTypeSelector` is used instead.
 		- **couchbase.typeSelector.documentTypesRegex** - Specified the regular expression for mapping Couchbase document IDs to Elasticsearch types. Example: `^(?<type>\w+)::.+$` will map document IDs of the format `<type>::<stuff>` to the type `<type>`, so the ID `user::123` will be indexed under the type `user`.
 	- **`org.elasticsearch.transport.couchbase.capi.RegexTypeSelector`** - Maps document IDs that match the specified regular expressions to the named types. If the ID doesn't match any of the specified expressions, `DefaultTypeSeletor` is used to select the type.
@@ -85,7 +85,7 @@ Configuration for the plugin is specified as part of the Elasticsearch config fi
 ### Mapping parent-child relationships ###
 
 - **couchbase.parentSelector** - The parent selector class to use for mapping child documents to parents. Note that because of the nature of XDCR, it's possible that the child document will be replicated before the parent, leading to unpredictable behaviour on the Elasticsearch side.
-	- **`org.elasticsearch.transport.couchbase.capi.DefaultParentSelector`** - Maps documents to parents according to a predefined map of types to field names. 
+	- **`org.elasticsearch.transport.couchbase.capi.DefaultParentSelector`** - Maps documents to parents according to a predefined map of types to field names.
 		- **couchbase.parentSelector.documentTypeParentFields.*** - Specifies which document field contains the ID of the parent document for that particular type. For example, `couchbase.parentSelector.documentTypeParentFields.order: doc.user_id` will set the parent ID of all documents in the type `order` to the value of the user_id field.
 	- **`org.elasticsearch.transport.couchbase.capi.RegexParentSelector`** - Maps documents to parents according to a specified regular expression with the capture group `parent`. Optionally lets you specify the format for the parent document ID.
 		- **couchbase.parentSelector.documentTypesParentRegex.*** - A named regular expression for matching the parent document ID. For example, `couchbase.documentTypesParentRegex.typeA: ^typeA::(?<parent>.+)` with the document ID `typeA::123` will use `123` as the parent document ID.
@@ -115,90 +115,90 @@ If you're editing the policy file directly, add the following to the end of the 
       permission java.net.SocketPermission "*", "listen,resolve";
       permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
     };
-    
-Replace `file:/<path>/*` with the directory where you installed the plugin. For example, if you installed Elasticsearch from as a deb/rpm package on Linux, this would be `file:/usr/share/elasticsearch/plugins/transport-couchbase/*` - note the trailing `*`, which means that the policy will apply to all files in that directory. 
+
+Replace `file:/<path>/*` with the directory where you installed the plugin. For example, if you installed Elasticsearch from as a deb/rpm package on Linux, this would be `file:/usr/share/elasticsearch/plugins/transport-couchbase/*` - note the trailing `*`, which means that the policy will apply to all files in that directory.
 
 If you prefer to use the GUI applet, run specify the location of the policy file with the `-file` parameter, for example:
-    
-    sudo $JAVA_HOME/bin/policytool -file $JAVA_HOME/jre/lib/security/java.policy 
+
+    sudo $JAVA_HOME/bin/policytool -file $JAVA_HOME/jre/lib/security/java.policy
 
 When the applet window appears, verify that the Policy File textbox shows the name of the policy file you're going to edit. To add the required security settings click on the "Add Policy Entry" button. In the new "Policy Entry" window that will appear, fill in the CodeBase textbox with the URL path to the plugin's installation directory, as explained above.
 Next, add each of the following permissions by clicking on the "Add Permission" button for each, then selecting the specified options:
 
     1.)  permission javax.security.auth.AuthPermission "modifyPrincipals";
-    
+
          From the "Permission:" dropdown select:
-         
+
             AuthPermission
-         
+
          From the "Target Name:" dropdown select:
-         
+
             modifyPrincipals
-         
+
          Click "Ok"
 
     2.)  permission javax.security.auth.AuthPermission "modifyPrivateCredentials";
-    
+
          From the "Permission:" dropdown select:
-         
+
             AuthPermission
-         
+
          From the "Target Name:" dropdown select:
-         
+
             modifyPrivateCredentials
-         
+
          Click "Ok"
 
     3.)  permission javax.security.auth.AuthPermission "setReadOnly";
-    
+
          From the "Permission:" dropdown select:
-         
+
             AuthPermission
-         
+
          From the "Target Name:" dropdown select:
-         
+
             setReadOnly
-         
+
          Click "Ok"
 
     4.)  permission java.lang.RuntimePermission "setContextClassLoader";
-    
+
          From the "Permission:" dropdown select:
-         
+
             RuntimePermission
-         
+
          From the "Target Name:" dropdown select:
-         
+
             setContextClassLoader
-         
+
          Click "Ok"
-	
+
     5.)  permission java.net.SocketPermission "*", "listen,resolve";
-    
+
          From the "Permission:" dropdown select:
-         
+
             SocketPermission
-         
+
          In the "Target Name:" textbox type:
-         
+
             *
-         
+
          In the "Actions:" dropdown type:
-         
+
             listen,resolve
-         
+
          Click "Ok"
-	
+
     6.)  permission "java.lang.reflect.ReflectPermission" "suppressAccessChecks";
-    
+
          From the "Permission:" dropdown select:
-         
+
             ReflectPermission
-         
+
          From the "Target Name:" dropdown select:
-         
+
             suppressAccessChecks
-         
+
          Click "Ok"
 
 At the end of the process, your policy tool should look similar to this:
@@ -254,5 +254,5 @@ This module is built using maven.  It depends on another project which is not in
 Then in this project run
 
     mvn package
-    
+
 The final plugin package will be in the target/releases folder.
